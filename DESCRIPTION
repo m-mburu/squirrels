@@ -1,0 +1,24 @@
+Package: squirrels
+Title: New York Squirrels Package
+Version: 0.0.0.9000
+Authors@R: 
+    person("Moses Mburu", , , "moses.mburu@finddx.org", role = c("aut", "cre"))
+Description: A package to explore suirrel data set.
+License: MIT + file LICENSE
+Depends: 
+    R (>= 2.10)
+Imports: 
+    glue
+Suggests: 
+    dplyr,
+    knitr,
+    readr,
+    rmarkdown,
+    stringr,
+    testthat
+VignetteBuilder: 
+    knitr
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.0
