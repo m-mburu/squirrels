@@ -18,6 +18,6 @@ Check the integrity of the column of primary fur colors
 \examples{
 my_data_squirrels <- readr::read_csv(
   system.file("nyc_squirrels_sample.csv", package = "squirrels")
-  )
+)
 check_squirrel_data_integrity(my_data_squirrels)
 }

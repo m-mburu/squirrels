@@ -7,6 +7,10 @@ editor_options:
 
 ```{r development, include=FALSE}
 library(testthat)
+library(ggplot2)
+library(dplyr)
+library(glue)
+library(tools)
 ```
 
 ```{r development-load}
@@ -42,12 +46,12 @@ check_primary_color_is_ok <- function(string) {
   return(all_colors_OK)
 }
 ```
-  
+
 ```{r example-check_primary_color_is_ok}
 check_primary_color_is_ok(string = c("Black", "Cinnamon", NA))
 check_primary_color_is_ok(string = c("Gray", "Cinnamon", "Gray"))
 ```
-  
+
 ```{r tests-check_primary_color_is_ok}
 test_that("check_primary_color_is_ok works", {
   
@@ -62,7 +66,7 @@ test_that("check_primary_color_is_ok works", {
 ```
 
 # Check the integrity of the column of primary fur colors
-    
+
 You can check the integrity of the primary fur colors of a dataset with `check_squirrel_data_integrity()`. This function checks that the dataset contains a `primary_fur_color` variable, and that this column only contains allowed values ("Gray", "Cinnamon", "Black", and missing values).
 
 ```{r function-check_squirrel_data_integrity}
@@ -75,7 +79,7 @@ You can check the integrity of the primary fur colors of a dataset with `check_s
 #'
 #' @examples
 check_squirrel_data_integrity <- function(df_squirrels){
-    
+  
   # Check if there is a primary_fur_color column
   if (isFALSE("primary_fur_color" %in% names(df_squirrels))) {
     stop("There is no primary_fur_color in this dataset")
@@ -87,17 +91,81 @@ check_squirrel_data_integrity <- function(df_squirrels){
   if (isTRUE(primary_colors_ok)){
     message("All primary fur colors are ok")
   }
-   
+  
 }
 ```
-  
+
 ```{r example-check_squirrel_data_integrity}
 my_data_squirrels <- readr::read_csv(
   system.file("nyc_squirrels_sample.csv", package = "squirrels")
-  )
+)
 check_squirrel_data_integrity(my_data_squirrels)
 ```
+
+# study_activity
+
+```{r function-study_activity}
+#' Study the activities of the squirrels given a primary fur color
+#'
+#' @param df_squirrels_act Data frame. A dataset with the activities of the squirrels. This dataset mush have at leat these 4 columns: "age", "primary_fur_color", "activity", "counts".
+#' @param col_primary_fur_color Character. The color of the primary fur color of interest. Only the squirrels with this primary fur color will be considered in the analysis.
+#' 
+#' @importFrom dplyr filter
+#' @importFrom ggplot2 ggplot aes geom_col scale_fill_manual labs
+#' @importFrom magrittr %>% 
+#'
+#' @return A list of two named elements. The first one is the filtered table. The second one is the ggplot.
+#' @export
+#'
+#' @examples
+study_activity <- function(df_squirrels_act, col_primary_fur_color) {
   
+  if(isFALSE(is.data.frame(df_squirrels_act))) {
+    stop("df_squirrels_act is not a data frame")
+  }
+  
+  if(isFALSE(is.character(col_primary_fur_color))) {
+    stop("col_primary_fur_color is not a character vector")
+  }
+  
+  
+  table <- df_squirrels_act %>% 
+    filter(col_primary_fur_color == primary_fur_color)
+  
+  graph <- table %>% 
+    ggplot() +
+    aes(x = activity, y = counts, fill = age) +
+    geom_col() +
+    labs(x = "Type of activity",
+         y = "Number of observations",
+         title = glue("Type of activity by age for {tolower(col_primary_fur_color)} squirrels")) +
+    scale_fill_manual(name = "Age",
+                      values = c("#00688B", "#00BFFF"))
+  
+  return(list(table = table, graph = graph))
+}
+
+
+```
+
+
+```{r example-study_activity}
+data(nyc_squirrels_dummy)
+study_activity(df_squirrels_act = nyc_squirrels_dummy, 
+               col_primary_fur_color =  "Black")
+```
+
+
+
+```{r tests-study_activity}
+test_that("study_activity works", {
+  expect_true(inherits(study_activity, "function")) 
+})
+```
+
+
+
+
 ```{r tests-check_squirrel_data_integrity}
 test_that("check_squirrel_data_integrity works", {
   
@@ -110,20 +178,105 @@ test_that("check_squirrel_data_integrity works", {
   # Error : no primary_fur_color column in the dataset
   my_data_squirrels_wrong_colname <- my_data_squirrels %>% 
     dplyr::rename(primary_color = primary_fur_color)
-
+  
   expect_error(check_squirrel_data_integrity(my_data_squirrels_wrong_colname), 
                regexp = "There is no primary_fur_color in this dataset")
   
   # Error : not allowed colors in the primary_fur_color column
   my_data_squirrels_wrong_colors <- my_data_squirrels %>% 
-     dplyr::mutate(primary_fur_color = stringr::str_to_lower(primary_fur_color))
+    dplyr::mutate(primary_fur_color = stringr::str_to_lower(primary_fur_color))
   
   expect_error(check_squirrel_data_integrity(my_data_squirrels_wrong_colors), 
                regexp = "The vector of primary fur color contains not allowed colors")
   
 })
 ```
+
+
+# save_as_csv
+
+```{r function-save_as_csv}
+
+#' A function to save csv
+#' @param dataset A data frame 
+#' @param path_name A file path
+#'
+#' @return Doesn't eturn anything writes a file to disk
+#' @importFrom tools file_ext
+#' @importFrom utils  write.csv2
+#'
+#' @export
+#' @examples
+#' 
+save_as_csv <- function(dataset, path_name){
   
+  file_extension = file_ext(path_name)
+  folder_exists = file.exists(dirname(path_name))
+  
+  if(file_extension != "csv"){
+    
+    stop("the extension of the file to create is not the right one")
+    
+  }
+  if(isFALSE(inherits(dataset, "data.frame"))){
+    
+    
+    stop("the function is not applied to a data.frame")
+  }
+  
+  if(isFALSE(folder_exists)){
+    
+    
+    stop("the path where the file should be saved does not exist")
+    
+  }
+  
+  write.csv2(dataset, file = path_name)
+  
+  return(path_name)
+  
+}
+
+
+```
+
+
+
+
+```{r example-save_as_csv}
+library(dplyr)
+# Create a temporary directory
+my_temp_folder <- tempfile(pattern = "savecsv")
+dir.create(my_temp_folder)
+
+data(iris)
+# ok: the .csv file is saved in the current project
+iris %>% save_as_csv(file.path(my_temp_folder, "output.csv"))
+
+# ok: the .csv file is saved and the file opens
+iris %>% save_as_csv(file.path(my_temp_folder, "output.csv")) %>% browseURL() 
+```
+
+
+
+
+```{r tests-save_as_csv}
+library(dplyr)
+test_that("save_as_csv works", {
+  my_temp_folder <- tempfile(pattern = "savecsv")
+  expect_error(iris %>% save_as_csv(file.path(my_temp_folder, "output.xlsx")),
+               regexp = "the extension of the file to create is not the right one")
+  
+  expect_error(NULL %>% save_as_csv(file.path(my_temp_folder, "output.csv")),
+               regexp = "the function is not applied to a data.frame")
+  
+  expect_error(iris %>% save_as_csv(file.path(my_temp_folder, "does/no/exist.csv")) ,  
+               regexp = "the path where the file should be saved does not exist")
+  
+})
+
+```
+
 
 ```{r development-inflate, eval=FALSE}
 # Run but keep eval=FALSE to avoid infinite loop

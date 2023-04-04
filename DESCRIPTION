@@ -8,9 +8,13 @@ License: MIT + file LICENSE
 Depends: 
     R (>= 2.10)
 Imports: 
-    glue
-Suggests: 
     dplyr,
+    ggplot2,
+    glue,
+    magrittr,
+    tools,
+    utils
+Suggests: 
     knitr,
     readr,
     rmarkdown,

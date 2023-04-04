@@ -27,32 +27,44 @@ You can check if the column of primary fur color contains only allowed values wi
 Allowed values are "Gray", "Cinnamon", "Black", and missing values. If the column contains not allowed values, an explicit error message is displayed.
 
 
-  
-
 ```{r example-check_primary_color_is_ok}
 check_primary_color_is_ok(string = c("Black", "Cinnamon", NA))
 check_primary_color_is_ok(string = c("Gray", "Cinnamon", "Gray"))
 ```
 
-  
-
 # Check the integrity of the column of primary fur colors
 
-    
 You can check the integrity of the primary fur colors of a dataset with `check_squirrel_data_integrity()`. This function checks that the dataset contains a `primary_fur_color` variable, and that this column only contains allowed values ("Gray", "Cinnamon", "Black", and missing values).
 
-
-  
 
 ```{r example-check_squirrel_data_integrity}
 my_data_squirrels <- readr::read_csv(
   system.file("nyc_squirrels_sample.csv", package = "squirrels")
-  )
+)
 check_squirrel_data_integrity(my_data_squirrels)
 ```
 
-  
+# study_activity
 
-  
+```{r example-study_activity}
+data(nyc_squirrels_dummy)
+study_activity(df_squirrels_act = nyc_squirrels_dummy, 
+               col_primary_fur_color =  "Black")
+```
 
+# save_as_csv
+
+```{r example-save_as_csv}
+library(dplyr)
+# Create a temporary directory
+my_temp_folder <- tempfile(pattern = "savecsv")
+dir.create(my_temp_folder)
+
+data(iris)
+# ok: the .csv file is saved in the current project
+iris %>% save_as_csv(file.path(my_temp_folder, "output.csv"))
+
+# ok: the .csv file is saved and the file opens
+iris %>% save_as_csv(file.path(my_temp_folder, "output.csv")) %>% browseURL() 
+```
 

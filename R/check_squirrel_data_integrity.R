@@ -10,10 +10,10 @@
 #' @examples
 #' my_data_squirrels <- readr::read_csv(
 #'   system.file("nyc_squirrels_sample.csv", package = "squirrels")
-#'   )
+#' )
 #' check_squirrel_data_integrity(my_data_squirrels)
 check_squirrel_data_integrity <- function(df_squirrels){
-    
+  
   # Check if there is a primary_fur_color column
   if (isFALSE("primary_fur_color" %in% names(df_squirrels))) {
     stop("There is no primary_fur_color in this dataset")
@@ -25,5 +25,5 @@ check_squirrel_data_integrity <- function(df_squirrels){
   if (isTRUE(primary_colors_ok)){
     message("All primary fur colors are ok")
   }
-   
+  
 }
