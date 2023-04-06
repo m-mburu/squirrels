@@ -1,0 +1,59 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# squirrels
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of squirrels is to ...
+
+## Installation
+
+You can install the development version of squirrels from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("m-mburu/squirrels")
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+```{r example}
+library(squirrels)
+## basic example code
+```
+
+## Check Squirrel integrity
+
+```{r cars}
+my_data_squirrels <- readr::read_csv(
+  system.file("nyc_squirrels_sample.csv", package = "squirrels")
+)
+check_squirrel_data_integrity(my_data_squirrels)
+
+```
+
+
+# study_activity
+
+```{r example-study_activity}
+data(nyc_squirrels_dummy)
+study_activity(df_squirrels_act = nyc_squirrels_dummy, 
+               col_primary_fur_color =  "Black")
+```
+
